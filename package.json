@@ -1,0 +1,11 @@
+{
+  "name": "redis-copy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:pierophp/redis-copy.git",
+  "author": "Piero Giusti <pierophp@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "redis": "^2.8.0"
+  }
+}
