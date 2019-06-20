@@ -39,12 +39,30 @@ const sourceGet = promisify(sourceRedisClient.GET).bind(sourceRedisClient);
 const targetSet = promisify(targetRedisClient.SET).bind(targetRedisClient);
 
 (async function boot() {
-  const keys = await sourceKeys('*');
+  try {
+    const keys = await sourceKeys('*');
 
-  for (const key of keys) {
-    const value = await sourceGet(key);
+    console.log(`${keys.length} keys found`);
 
-    await targetSet(key, value);
+    let i = 0;
+
+    for (const key of keys) {
+      i++;
+      if (i % 10 === 0) {
+        console.log(`Copying ${i}`);
+      }
+
+      try {
+        const value = await sourceGet(key);
+
+        await targetSet(key, value);
+      } catch (e) {
+        console.error(e);
+        continue;
+      }
+    }
+  } catch (e) {
+    console.error(e);
   }
 
   process.exit();
