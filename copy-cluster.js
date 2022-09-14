@@ -1,4 +1,4 @@
-const IORedis = require('ioredis');
+const { Cluster } = require('ioredis');
 
 if (!process.argv[2]) {
   console.log('Set the source Redis');
@@ -15,25 +15,32 @@ const targetSplit = process.argv[3].split(':');
 
 const sourceRedisHost = sourceSplit[0];
 const sourceRedisPort = sourceSplit[1] || 6379;
-const sourceRedisDb = sourceSplit[2] || 0;
 
 const targetRedisHost = targetSplit[0];
 const targetRedisPort = targetSplit[1] || 6379;
-const targetRedisDb = targetSplit[2] || 0;
 
-const sourceRedisClient = new IORedis({
-  host: sourceRedisHost,
-  port: sourceRedisPort,
-  db: sourceRedisDb,
-  maxRetriesPerRequest: 2,
-});
+const sourceRedisClient = new Cluster(
+  [
+    {
+      host: sourceRedisHost,
+      port: sourceRedisPort,
+    },
+  ],
+  {
+    maxRetriesPerRequest: 2,
+  },
+);
 
-const targetRedisClient = new IORedis({
-  host: targetRedisHost,
-  port: targetRedisPort,
-  db: targetRedisDb,
-  maxRetriesPerRequest: 2,
-});
+const targetRedisClient = new Cluster(
+  [
+    {
+      host: targetRedisHost,
+      port: targetRedisPort,
+    },
+  ],
+
+  { maxRetriesPerRequest: 2 },
+);
 
 (async function boot() {
   try {
